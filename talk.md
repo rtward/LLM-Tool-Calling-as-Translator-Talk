@@ -151,10 +151,6 @@ What it really is, is structured output
 
 # Structured Output
 
----
-
-# Structured Output
-
 ## vs
 
 # Regular Output
@@ -177,6 +173,8 @@ What it really is, is structured output
 
 ---
 
+<!-- 8:00 -->
+
 # Demos!
 
 <!--
@@ -188,9 +186,9 @@ These demos are all using the OpenAI API with OpenRouter
 
 # Yes / No
 
-```
+```typescript
 	const yesNoSchema = z.object({
-		an.enum(["yes", "maybe", "no"]).describe("The answer to the question"),
+		answer: z.enum(["yes", "maybe", "no"]).describe("The answer to the question"),
 	});
 
 	const response = await openRouter.chat.send({
@@ -229,6 +227,8 @@ These demos are all using the OpenAI API with OpenRouter
 
 # 20 Questions
 
+<!-- 12:00 -->
+
 ![height:500px](images/twenty-questions-demo.png)
 
 <!--
@@ -239,6 +239,8 @@ This isn't really part of the talk, I just thought it was a fun use case for the
 
 # Document Parsing
 
+<!-- 13:00 -->
+
 <!--
 Translating a document into a standardized machine readable format
 Actually the thing that got me going on this kick
@@ -248,7 +250,7 @@ Actually the thing that got me going on this kick
 
 # Document Parsing
 
-```
+```typescript
 	const response = await openai.chat.completions.create({
 		model: "google/gemini-2.5-flash",
 		messages: [
@@ -303,6 +305,8 @@ Actually the thing that got me going on this kick
 
 ---
 
+<!-- 18:00 -->
+
 # Personal Assistant
 
  - Decide intent
@@ -330,6 +334,8 @@ Not going to post the code for this one because it's a lot and it looks much the
 
 ---
 
+<!-- 30:00 -->
+
 # Tool Calling
 
 ![height:500px](images/tool-call-flowchart.png)
@@ -341,6 +347,8 @@ Tool calling closes that loop by letting us then send information back to the LL
 
 ---
 
+<!-- 32:00 -->
+
 # Weather Demo
 
 <video height=500px src='images/weather-bot-demo.mov'></video>
@@ -351,6 +359,8 @@ It has access to a tool to get the weather, then interprets the result for me.
 -->
 
 ---
+
+<!-- 36:00 -->
 
 # Tool Calling Formats
 
@@ -378,6 +388,8 @@ Similarities:
 -->
 
 ---
+
+<!-- 38:00 -->
 
 # OpenAI
 
@@ -431,6 +443,8 @@ async function handleToolCall(toolCall) {
 
 ---
 
+<!-- 39:00 -->
+
 # Bedrock
 
 <!--
@@ -477,6 +491,8 @@ async function handleToolUse(toolCall) {
 
 ---
 
+<!-- 40:00 -->
+
 # MCP
 
 <!--
@@ -519,13 +535,13 @@ export async function mcpToolCall(args) {
 
 ---
 
+<!-- 44:00 -->
+
 # Inspiration
 
  * Planning Tool
  * Home Automation
  * Personal Knowledge Base
-
-<!-- 44:00 -->
 
 <!--
 Planning Tool: Have the LLM make a plan step by step, then you can run those steps independently or sequentially
