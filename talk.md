@@ -214,7 +214,9 @@ These demos are all using the OpenAI API with OpenRouter
 
 # Yes / No
 
-<video height=500px src='images/yes-no-demo.mov'></video>
+<video height=500px autoplay loop>
+	<source src='images/yes-no-demo.mov'>
+</video>
 
 ---
 
