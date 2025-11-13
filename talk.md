@@ -4,6 +4,14 @@ theme: default
 class: invert
 ---
 
+# TODOS
+
+ - Take a pass on cleaning up and commenting the demo code
+ - Run through the whole talk for readability
+ - Do some styling on the talk
+
+---
+
 # LLM Tool Calling
 
 ## or
