@@ -18,6 +18,10 @@ class: invert
 
 # Your computer's universal translator
 
+![width:300px](images/qr-link.png)
+
+https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
+
 ---
 
 # Who am I?
