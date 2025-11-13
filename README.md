@@ -11,7 +11,11 @@ This talk will be / has been (change according to the date) recorded and uploade
 
 ## Viewing the Slides
 
-The slides for this talk were created using Marp, the [Markdown Presentaion System](https://marp.app/).  The raw slides are available in the `talk.md` file, and the published slideshow can be viewed [here](https://marp.app/).
+The slides for this talk were created using Marp, the [Markdown Presentaion System](https://marp.app/).  The raw slides are available in the `talk.md` file, and the published slideshow can be viewed [here](https://rtward.github.io/LLM-Tool-Calling-as-Translator-Talk/). 
+
+Other available talk formats:
+ - [PPTX](https://rtward.github.io/LLM-Tool-Calling-as-Translator-Talk/talk.pptx)
+ - [PDF](https://rtward.github.io/LLM-Tool-Calling-as-Translator-Talk/talk.pdf)
 
 ## Running the Demos
 

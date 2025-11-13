@@ -37,6 +37,20 @@ jobs:
               env:
                   MARP_USER: root:root
 
+            - name: Build slides with Marp
+              uses: docker://marpteam/marp-cli:v1.7.0
+              with:
+                  args: --output ./dist/talk.pdf ./talk.md
+              env:
+                  MARP_USER: root:root
+
+            - name: Build slides with Marp
+              uses: docker://marpteam/marp-cli:v1.7.0
+              with:
+                  args: --output ./dist/talk.pptx ./talk.md
+              env:
+                  MARP_USER: root:root
+
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
               with:
