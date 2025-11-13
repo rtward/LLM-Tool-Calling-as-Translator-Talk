@@ -4,6 +4,16 @@ theme: default
 class: invert
 ---
 
+# TODOS
+ - Finish personal assistant demo
+ - Do Weather Bot demo
+ - Fill out timings
+ - Add code to slides
+ - Record demos
+ - Style Talk
+
+---
+
 # LLM Tool Calling
 
 ## or
@@ -34,9 +44,9 @@ class: invert
 
  * Several Time Phreaknic Speaker
  * Currently building AI products for the legal industry
- * For Accessing our Analytics Product
- * For Analyzing USPTO rejections
- * And Offering Suggestions Based on Past Performance
+   * For Accessing our Analytics Product
+   * For Analyzing USPTO rejections
+   * And Offering Suggestions Based on Past Performance
 
 <!-- 0:30 -->
 
@@ -98,7 +108,6 @@ Story about using Claude to inventory and make a shopping list
  * Pressured to use AI
  * Dissapointed with coding tools
  * Dissapointed with writing tools
- * Dissapointed with summarization
  * Thrilled with data extraction
 
 <!--
@@ -126,6 +135,10 @@ Not translation from english to japanese
 ---
 
 # Tool Calling
+
+ * MCP Servers
+ * Tool Calling
+ * RAG 
 
 <!-- 6:00 -->
 
@@ -186,6 +199,8 @@ What it really is, is structured output
 
 <!--
 LLMs complex enough to write out structured data to invoke a tool
+Structured output is one way, from the LLM back to the machine
+Tool calling is when the LLM invokes a tool, and then uses the output.
 -->
 
 ---
@@ -193,6 +208,10 @@ LLMs complex enough to write out structured data to invoke a tool
 ---
 
 # Demos!
+
+<!--
+Here are some demos of simple use cases for structured content
+-->
 
 ---
 
@@ -232,14 +251,97 @@ Actually the thing that got me going on this kick
 
 ---
 
-# Home Automation
+# Tool Calling
 
- - Decide intent
- - Find target
- - Decide action
+<!--
+So all of those demos were one way, we got some info out of an LLM and used it to do something for the user.
+Tool calling closes that loop by letting us then send information back to the LLM.
+-->
+
+---
+
+# Weather Demo
+
+<!--
+In the personal assistent demo, I showed off fetching the weather based on a user's request.
+This closes the loop and allows us to ask questions about the weather to an agent that can access weather reports.
+-->
 
 ---
 
-# 
+# Tool Calling Formats
+
+ * MCP
+ * OpenAI
+ * Bedrock
+
+<!--
+Basically all of these are based on the JSONSchema format.
+-->
 
 ---
+
+# MCP
+
+<!--
+MCP has evolved as one of the early frontrunners in tool calling.
+The idea is a simple standard API that conforms to a standard format and allows an LLM to call both local and remote tools easily.
+-->
+
+ - TODO: MCP Server Code
+ - TODO: MCP Client Code
+
+---
+
+# OpenAI
+
+<!--
+OpenAI supports MCP now, but also has some of their own ideas.
+They've supported calling OpenAPI spec APIs as well.
+IMO this spec can be too complex for simple LLMs to call, hasn't worked well in my experience.
+OpenAI also has a native foramt for doing tool calls in their API, which is what I'm showing off here.
+All of these demos were done using the OpenAI API, but talking to the OpenRouter LLM service.
+-->
+
+ - TODO: OpenAI Tool Calling
+
+---
+
+# Bedrock
+
+<!--
+Bedrock is an API only service by AWS that supports a ton of foundational models
+-->
+
+ - TODO: Bedrock Tool Calling
+
+---
+
+# Inspiration
+
+ * Planning Tool
+ * Home Automation
+ * Personal Knowledge Base
+
+<!-- 44:00 -->
+
+<!--
+Planning Tool: Have the LLM make a plan step by step, then you can run those steps independently or sequentially
+Home Automation: Surprisingly easy to start playing around with building an Alexa type experience for Home Assistant
+PKB: Store your documents and notes and let an LLM search them for you
+-->
+
+---
+
+<!-- 45:00 -->
+
+# That's all folks! / Questions?
+
+![width:300px](images/qr-link.png)
+
+https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
+
+Website: https://rtward.com/
+Signal: `rtward.32`
+Bluesky: `@rtward.com`
+Mastodon: `@rtward@mastodon.social`
