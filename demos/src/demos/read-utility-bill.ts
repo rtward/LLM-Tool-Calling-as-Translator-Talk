@@ -74,8 +74,6 @@ export async function readUtilityBill(file: string) {
 		},
 	});
 
-	console.dir(response, { depth: null });
-
 	const respContent = response.choices[0].message.content as string;
 	const parsed = billInfoSchema.safeParse(JSON.parse(respContent));
 	if (!parsed.success)

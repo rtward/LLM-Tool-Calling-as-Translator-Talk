@@ -1,7 +1,5 @@
-import { OpenAI } from "openai";
 import z from "zod";
 
-import { env } from "../util/config.js";
 import { getOpenAIClient } from "../util/openai-client.js";
 
 const categorySchema = z
@@ -14,13 +12,9 @@ const informationRequestSchema = z
 	.enum(["get_weather", "check_traffic", "search_email"])
 	.describe("The tool to use for the information request");
 
-type InformationRequestTool = z.infer<typeof informationRequestSchema>;
-
 const actionRequestSchema = z
 	.enum(["set_timer", "schedule_meeting", "send_email"])
 	.describe("The tool to use for the action request");
-
-type ActionRequestTool = z.infer<typeof actionRequestSchema>;
 
 async function getTheWeather(request: string): Promise<string> {
 	console.log("Getting the weather for request:", request);

@@ -8,6 +8,12 @@ Install the dependencies with pnpm:
 pnpm install
 ```
 
+Set your OpenRouter key as an environment variable:
+
+```
+export OPENROUTER_API_KEY='<MY KEY>'
+```
+
 Run the demos with:
 
 ```

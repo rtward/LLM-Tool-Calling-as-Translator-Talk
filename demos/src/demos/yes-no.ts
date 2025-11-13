@@ -3,13 +3,15 @@ import z from "zod";
 
 import { env } from "../util/config.js";
 
-const yesNoSchema = z.object({
-	answer: z.enum(["yes", "maybe", "no"]).describe("The answer to the question"),
-});
-
 export async function yesOrNo(statement: string) {
 	const openRouter = new OpenRouter({
 		apiKey: env.OPENROUTER_API_KEY,
+	});
+
+	const yesNoSchema = z.object({
+		answer: z
+			.enum(["yes", "maybe", "no"])
+			.describe("The answer to the question"),
 	});
 
 	const response = await openRouter.chat.send({

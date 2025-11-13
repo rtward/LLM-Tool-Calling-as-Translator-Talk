@@ -67,8 +67,6 @@ export async function extractSignature(file: string) {
 		},
 	});
 
-	console.dir(response, { depth: null });
-
 	const respContent = response.choices[0].message.content as string;
 	const parsed = signatureExtractionSchema.safeParse(JSON.parse(respContent));
 	if (!parsed.success)

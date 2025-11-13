@@ -5,11 +5,8 @@ class: invert
 ---
 
 # TODOS
- - Finish personal assistant demo
  - Do Weather Bot demo
  - Fill out timings
- - Add code to slides
- - Record demos
  - Style Talk
 
 ---
@@ -180,42 +177,43 @@ What it really is, is structured output
 
 ---
 
-# Tool Calling
-
-> *user:* What's the weather like in Nashville?
-
-```
-{
-  "function_call": {
-    "name": "get_weather",
-    "arguments": {
-      "location": "Nashville, TN",
-    }
-  }
-}
-```
-
-<!-- 8:00 -->
-
-<!--
-LLMs complex enough to write out structured data to invoke a tool
-Structured output is one way, from the LLM back to the machine
-Tool calling is when the LLM invokes a tool, and then uses the output.
--->
-
----
-
----
-
 # Demos!
 
 <!--
 Here are some demos of simple use cases for structured content
+These demos are all using the OpenAI API with OpenRouter
 -->
 
 ---
 
 # Yes / No
+
+```
+	const yesNoSchema = z.object({
+		an.enum(["yes", "maybe", "no"]).describe("The answer to the question"),
+	});
+
+	const response = await openRouter.chat.send({
+		model: "google/gemini-2.5-flash",
+		messages: [
+			{
+				role: "system",
+				content: "Your job is to translate a response from a user into a simple 'yes', 'no', or 'maybe' answer.",
+			},
+			{
+				role: "user",
+				content: statement,
+			},
+		],
+		responseFormat: {
+			type: "json_schema",
+			jsonSchema: {
+				name: "YesOrNoResponse",
+				schema: z.toJSONSchema(yesNoSchema),
+			},
+		},
+	});
+```
 
 <!--
 "Translating" a human response into a binary yes or no
@@ -223,7 +221,15 @@ Here are some demos of simple use cases for structured content
 
 ---
 
+# Yes / No
+
+<video height=500px src='images/yes-no-demo.mov'></video>
+
+---
+
 # 20 Questions
+
+![height:500px](images/twenty-questions-demo.png)
 
 <!--
 This isn't really part of the talk, I just thought it was a fun use case for the first demo
@@ -233,13 +239,67 @@ This isn't really part of the talk, I just thought it was a fun use case for the
 
 # Document Parsing
 
- * Signature Extraction
- * Bill Information
-
 <!--
 Translating a document into a standardized machine readable format
 Actually the thing that got me going on this kick
 -->
+
+---
+
+# Document Parsing
+
+```
+	const response = await openai.chat.completions.create({
+		model: "google/gemini-2.5-flash",
+		messages: [
+			{ role: "system", content: systemPrompt },
+			{
+				role: "user",
+				content: [
+					{
+						type: "file",
+						file: {
+							filename: "document.pdf",
+							file_id: "document.pdf",
+							file_data: fileData,
+						},
+					},
+				],
+			},
+		],
+		response_format: {
+			type: "json_schema",
+			json_schema: {
+				name: "SignatureExtractionResponse",
+				schema: z.toJSONSchema(signatureExtractionSchema),
+			},
+		},
+	});
+```
+
+---
+
+# Document Parsing
+
+![](images/signature-doc-image.png)
+
+---
+
+# Document Parsing
+
+![height:500px](images/find-signature-demo.png)
+
+---
+
+# Document Parsing
+
+![](images/bill-image.png)
+
+---
+
+# Document Parsing
+
+![height:500px](images/bill-demo.png)
 
 ---
 
@@ -248,6 +308,25 @@ Actually the thing that got me going on this kick
  - Decide intent
  - Find target
  - Decide action
+
+<!--
+The advantage of doing multiple levels of LLM calls is that you avoid having to put massive tool definitions into the context window.
+This saves you both context and makes your output more accurate in my experience.
+It does increase the cost and latency though.
+Not going to post the code for this one because it's a lot and it looks much the same.
+-->
+
+---
+
+# Personal Assistant
+
+![height=500px](images/assistant-flowchart.png)
+
+---
+
+# Personal Assistant
+
+<video height=500px src='images/assistant-demo.mov'></video>
 
 ---
 
