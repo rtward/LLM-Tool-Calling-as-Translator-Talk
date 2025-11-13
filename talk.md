@@ -354,9 +354,9 @@ It has access to a tool to get the weather, then interprets the result for me.
 
 # Tool Calling Formats
 
- * MCP
  * OpenAI
  * Bedrock
+ * MCP
 
 <!--
 Basically all of these are based on the JSONSchema format.
@@ -364,15 +364,18 @@ Basically all of these are based on the JSONSchema format.
 
 ---
 
-# MCP
+# Tool Calling Formats
+
+ * Tool Name
+ * Tool Arguments
+ * Tool Use ID
 
 <!--
-MCP has evolved as one of the early frontrunners in tool calling.
-The idea is a simple standard API that conforms to a standard format and allows an LLM to call both local and remote tools easily.
+Similarities:
+ - Tool Name
+ - Tool Use ID
+ - Tool Arguments
 -->
-
- - TODO: MCP Server Code
- - TODO: MCP Client Code
 
 ---
 
@@ -384,9 +387,47 @@ They've supported calling OpenAPI spec APIs as well.
 IMO this spec can be too complex for simple LLMs to call, hasn't worked well in my experience.
 OpenAI also has a native foramt for doing tool calls in their API, which is what I'm showing off here.
 All of these demos were done using the OpenAI API, but talking to the OpenRouter LLM service.
+Also have "custom" tools that can use context-free grammers for building output, but I haven't gotten into that
 -->
 
- - TODO: OpenAI Tool Calling
+```typescript
+const tools: ChatCompletionTool[] = [
+	{
+		type: "function",
+		function: {
+			name: ToolNames.GET_CURRENT_WEATHER,
+			description: "Get the current weather for a given location.",
+			parameters: z.toJSONSchema(getWeatherParamsSchema),
+		},
+	},
+];
+```
+
+---
+
+# OpenAI
+
+<!--
+Tool calls have their own role in the conversation
+-->
+
+```typescript
+async function handleToolCall(toolCall) {
+	const toolName = toolCall.function.name;
+	const args = toolCall.function.arguments;
+
+	if (toolName === ToolNames.GET_CURRENT_WEATHER) {
+		console.log("Handling get_weather tool call with args:", args);
+		...
+		return {
+			role: "tool",
+			tool_call_id: toolCall.id,
+			content: weather,
+		};
+	}
+	...
+}
+```
 
 ---
 
@@ -396,7 +437,85 @@ All of these demos were done using the OpenAI API, but talking to the OpenRouter
 Bedrock is an API only service by AWS that supports a ton of foundational models
 -->
 
- - TODO: Bedrock Tool Calling
+```typescript
+const tools = [{
+	toolSpec: {
+	name: 'multi-step-plan',
+	description:
+	  'Use this tool to create a multi step plan to accomplish your goal.',
+	inputSchema: {
+	  json: multiStepPlanSchema,
+	},
+  },
+}]
+```
+
+---
+
+# Bedrock
+
+<!--
+Tool use in bedrock is handled as a user message, not a separate thing
+-->
+
+```typescript
+async function handleToolUse(toolCall) {
+  ...
+  return {
+    role: 'user',
+    content: [
+      {
+        toolResult: {
+          toolUseId: toolCall.toolUseId,
+          content: [{ text: 'plan accepted' }],
+        },
+      }
+    ]
+  }
+}
+```
+
+---
+
+# MCP
+
+<!--
+MCP has evolved as one of the early frontrunners in tool calling.
+The idea is a simple standard API that conforms to a standard format and allows an LLM to call both local and remote tools easily.
+-->
+
+```typescript
+  server.tool('do-cool-stuff', 'Does some cool stuff',
+    { whatShouldIdo: z.string() },
+    async (args) => {
+	  ...
+      const result: CallToolResult = {
+        content: [{ type: 'text', text: coolStuffResult }],
+      }
+      return result
+    }
+  )
+```
+
+---
+
+# MCP
+
+<!--
+MCP has evolved as one of the early frontrunners in tool calling.
+The idea is a simple standard API that conforms to a standard format and allows an LLM to call both local and remote tools easily.
+-->
+
+```typescript
+export async function mcpToolCall(args) {
+  const result = await analyticsMcpClient.callTool({
+    name: args.name,
+    arguments: args.arguments,
+  })
+  const parsedResult = CallToolResultSchema.parse(result)
+  return parsedResult
+}
+```
 
 ---
 
