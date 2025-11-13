@@ -214,7 +214,7 @@ These demos are all using the OpenAI API with OpenRouter
 
 # Yes / No
 
-<video height=500px autoplay loop>
+<video height=500px autoplay loop muted>
 	<source src='images/yes-no-demo.mov'>
 </video>
 
@@ -325,7 +325,9 @@ Not going to post the code for this one because it's a lot and it looks much the
 
 # Personal Assistant
 
-<video height=500px src='images/assistant-demo.mov'></video>
+<video height=500px autoplay loop muted>
+	<source src='images/assistant-demo.mov'>
+</video>
 
 ---
 
@@ -346,7 +348,9 @@ Tool calling closes that loop by letting us then send information back to the LL
 
 # Weather Demo
 
-<video height=500px src='images/weather-bot-demo.mov'></video>
+<video height=500px autoplay loop muted>
+	<source src='images/weather-bot-demo.mov'>
+</video>
 
 <!--
 In this weather demo, I'm asking if I need a jacket for this trip I'm currently on.
