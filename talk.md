@@ -198,13 +198,29 @@ LLMs complex enough to write out structured data to invoke a tool
 
 # Yes / No
 
+<!--
+"Translating" a human response into a binary yes or no
+-->
+
 ---
 
 # 20 Questions
 
+<!--
+This isn't really part of the talk, I just thought it was a fun use case for the first demo
+-->
+
 ---
 
 # Document Parsing
+
+ * Signature Extraction
+ * Bill Information
+
+<!--
+Translating a document into a standardized machine readable format
+Actually the thing that got me going on this kick
+-->
 
 ---
 
