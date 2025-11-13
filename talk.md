@@ -4,13 +4,6 @@ theme: default
 class: invert
 ---
 
-# TODOS
- - Fill out timings
- - Style Talk
- - Workflow
-
----
-
 # LLM Tool Calling
 
 ## or
