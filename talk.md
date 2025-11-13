@@ -5,9 +5,9 @@ class: invert
 ---
 
 # TODOS
- - Do Weather Bot demo
  - Fill out timings
  - Style Talk
+ - Workflow
 
 ---
 
@@ -332,6 +332,8 @@ Not going to post the code for this one because it's a lot and it looks much the
 
 # Tool Calling
 
+![height:500px](images/tool-call-flowchart.png)
+
 <!--
 So all of those demos were one way, we got some info out of an LLM and used it to do something for the user.
 Tool calling closes that loop by letting us then send information back to the LLM.
@@ -341,9 +343,11 @@ Tool calling closes that loop by letting us then send information back to the LL
 
 # Weather Demo
 
+<video height=500px src='images/weather-bot-demo.mov'></video>
+
 <!--
-In the personal assistent demo, I showed off fetching the weather based on a user's request.
-This closes the loop and allows us to ask questions about the weather to an agent that can access weather reports.
+In this weather demo, I'm asking if I need a jacket for this trip I'm currently on.
+It has access to a tool to get the weather, then interprets the result for me.
 -->
 
 ---

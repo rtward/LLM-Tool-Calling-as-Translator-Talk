@@ -1,248 +1,273 @@
-import { OpenAI } from "openai";
+import type {
+	ChatCompletionMessageFunctionToolCall,
+	ChatCompletionMessageParam,
+	ChatCompletionTool,
+	ChatCompletionToolMessageParam,
+} from "openai/resources/chat/completions.mjs";
 import z from "zod";
-
-import { env } from "../util/config.js";
 import { getOpenAIClient } from "../util/openai-client.js";
 
-const categorySchema = z
-	.enum(["information_request", "action_request", "other_request"])
-	.describe("The category of the user's request");
-
-type RequestCategory = z.infer<typeof categorySchema>;
-
-const informationRequestSchema = z
-	.enum(["get_weather", "check_traffic", "search_email"])
-	.describe("The tool to use for the information request");
-
-type InformationRequestTool = z.infer<typeof informationRequestSchema>;
-
-const actionRequestSchema = z
-	.enum(["set_timer", "schedule_meeting", "send_email"])
-	.describe("The tool to use for the action request");
-
-type ActionRequestTool = z.infer<typeof actionRequestSchema>;
-
-async function getTheWeather(request: string): Promise<string> {
-	console.log("Getting the weather for request:", request);
-	return "placeholder weather info";
+enum ToolNames {
+	GET_CURRENT_WEATHER = "get_current_weather",
+	GET_FORECAST = "get_forecast",
 }
 
-async function checkTraffic(request: string): Promise<string> {
-	console.log("Checking traffic for request:", request);
-	return "placeholder traffic info";
-}
+const cityStateLocationSchema = z.object({
+	city: z.string().describe("The city name"),
+	state: z.string().optional().describe("The state or region name"),
+	country: z.string().optional().describe("The country name").default("US"),
+});
 
-async function searchEmail(request: string): Promise<string> {
-	console.log("Searching email for request:", request);
-	return "placeholder email search results";
-}
+const locationSchema = z.union([cityStateLocationSchema]);
 
-async function setTimer(request: string): Promise<string> {
-	console.log("Setting timer for request:", request);
-	return "placeholder timer set confirmation";
-}
+const getWeatherParamsSchema = z.object({
+	location: locationSchema.describe("The location to get the weather for"),
+});
 
-async function scheduleMeeting(request: string): Promise<string> {
-	console.log("Scheduling meeting for request:", request);
-	return "placeholder meeting scheduled confirmation";
-}
+const currentWeatherApiResponseSchema = z.object({
+	coord: z.object({
+		lon: z.number(),
+		lat: z.number(),
+	}),
+	weather: z.array(
+		z.object({
+			id: z.number(),
+			main: z.string(),
+			description: z.string(),
+			icon: z.string(),
+		}),
+	),
+	base: z.string(),
+	main: z.object({
+		temp: z.number(),
+		feels_like: z.number(),
+		temp_min: z.number(),
+		temp_max: z.number(),
+		pressure: z.number(),
+		humidity: z.number(),
+	}),
+	visibility: z.number(),
+	wind: z.object({
+		speed: z.number(),
+		deg: z.number(),
+	}),
+});
 
-async function sendAnEmail(request: string): Promise<string> {
-	console.log("Sending email for request:", request);
-	return "placeholder email sent confirmation";
-}
+const dailyForecastApiResponseSchema = z.object({
+	cod: z.string(),
+	message: z.number(),
+	cnt: z.number(),
+	list: z.array(
+		z.object({
+			dt: z.number(),
+			main: z.object({
+				temp: z.number(),
+				feels_like: z.number(),
+				temp_min: z.number(),
+				temp_max: z.number(),
+				pressure: z.number(),
+				humidity: z.number(),
+			}),
+			weather: z.array(
+				z.object({
+					id: z.number(),
+					main: z.string(),
+					description: z.string(),
+					icon: z.string(),
+				}),
+			),
+		}),
+	),
+});
 
 /**
- * This function categorizes the user's request into either a request for information, or a request to perform an action.
+ * Handle a tool call from the LLM by invoking the appropriate tool function.
  *
- * @param request
+ * @param toolCall
  */
-async function categorizeRequest(request: string): Promise<RequestCategory> {
-	const systemPrompt = `
-You are part of a series of agents that work together as a personal assistant AI.
-Your job is to categorize the user's request at a high level as either a request for information or a request to perform an action.
-`;
+async function handleToolCall(
+	toolCall: ChatCompletionMessageFunctionToolCall,
+): Promise<ChatCompletionToolMessageParam> {
+	const toolName = toolCall.function.name;
+	const args = toolCall.function.arguments;
 
-	const openai = getOpenAIClient();
+	if (toolName === ToolNames.GET_CURRENT_WEATHER) {
+		console.log("Handling get_weather tool call with args:", args);
 
-	const response = await openai.chat.completions.create({
-		model: "google/gemini-2.5-flash",
-		messages: [
-			{
-				role: "system",
-				content: systemPrompt,
-			},
-			{
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: request,
-					},
-				],
-			},
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "SignatureExtractionResponse",
-				schema: z.toJSONSchema(categorySchema),
-			},
-		},
-	});
+		const parsedArgs = getWeatherParamsSchema.safeParse(JSON.parse(args));
+		if (!parsedArgs.success)
+			throw new Error(`Failed to parse tool call args: ${args}`);
 
-	const respContent = response.choices[0].message.content as string;
+		const city = parsedArgs.data.location.city;
+		const state = parsedArgs.data.location.state ?? "";
+		const country = parsedArgs.data.location.country;
+		const location = `${city}${state ? `,${state}` : ""},${country}`;
 
-	const parsed = categorySchema.safeParse(JSON.parse(respContent));
-	if (!parsed.success)
-		throw new Error(`Failed to parse response: ${respContent}`);
+		const currentWeather = await fetch(
+			`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.OPENWEATHER_API_KEY}&units=imperial`,
+		);
 
-	console.log(`Extracted category for request "${request}":`, {
-		category: parsed.data,
-	});
+		const weatherData = currentWeatherApiResponseSchema.safeParse(
+			await currentWeather.json(),
+		);
+		if (!weatherData.success)
+			throw new Error(
+				`Failed to parse weather API response: ${JSON.stringify(
+					weatherData.error,
+				)}`,
+			);
 
-	return parsed.data;
-}
+		const weather = `The current weather in ${location} is ${weatherData.data.weather[0].description} with a temperature of ${weatherData.data.main.temp}°F (feels like ${weatherData.data.main.feels_like}°F).`;
 
-/**
- * This function handles requests for information, such as weather updates or traffic conditions.
- *
- */
-async function handleInformationRequest(request: string): Promise<string> {
-	const systemPrompt = `
-You are part of a series of agents that work together as a personal assistant AI.
-Your job is to route a user's request for information to the appropriate tool and return the result.
-`;
-
-	const openai = getOpenAIClient();
-
-	const response = await openai.chat.completions.create({
-		model: "google/gemini-2.5-flash",
-		messages: [
-			{
-				role: "system",
-				content: systemPrompt,
-			},
-			{
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: request,
-					},
-				],
-			},
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "InformationRequestResponse",
-				schema: z.toJSONSchema(informationRequestSchema),
-			},
-		},
-	});
-
-	const respContent = response.choices[0].message.content as string;
-
-	const parsed = informationRequestSchema.safeParse(JSON.parse(respContent));
-	if (!parsed.success)
-		throw new Error(`Failed to parse response: ${respContent}`);
-
-	console.log(`Extracted information request tool from "${request}":`, {
-		tool: parsed.data,
-	});
-
-	if (parsed.data === "get_weather") {
-		return await getTheWeather(request);
+		return {
+			role: "tool",
+			tool_call_id: toolCall.id,
+			content: weather,
+		};
 	}
 
-	if (parsed.data === "check_traffic") {
-		return await checkTraffic(request);
-	}
+	if (toolName === ToolNames.GET_FORECAST) {
+		console.log("Handling get_weather tool call with args:", args);
 
-	if (parsed.data === "search_email") {
-		return await searchEmail(request);
-	}
+		const parsedArgs = getWeatherParamsSchema.safeParse(JSON.parse(args));
+		if (!parsedArgs.success)
+			throw new Error(`Failed to parse tool call args: ${args}`);
 
-	throw new Error("Unsupported information request tool");
-}
+		const city = parsedArgs.data.location.city;
+		const state = parsedArgs.data.location.state ?? "";
+		const country = parsedArgs.data.location.country;
+		const location = `${city}${state ? `,${state}` : ""},${country}`;
 
-/**
- * This function handles requests to perform actions, such as setting timers or sending emails.
- *
- */
-async function handleActionRequest(request: string): Promise<string> {
-	const systemPrompt = `
-You are part of a series of agents that work together as a personal assistant AI.
-Your job is to route a user's request for action to the appropriate tool.
-`;
+		const dailyForecast = await fetch(
+			`https://api.openweathermap.org/data/2.5/forecast?q=${location}&appid=${process.env.OPENWEATHER_API_KEY}&units=imperial`,
+		);
 
-	const openai = getOpenAIClient();
+		const weatherData = dailyForecastApiResponseSchema.safeParse(
+			await dailyForecast.json(),
+		);
+		if (!weatherData.success)
+			throw new Error(
+				`Failed to parse forecast API response: ${JSON.stringify(
+					weatherData.error,
+				)}`,
+			);
 
-	const response = await openai.chat.completions.create({
-		model: "google/gemini-2.5-flash",
-		messages: [
+		const columns: {
+			header: string;
+			getter: (
+				item: z.infer<typeof dailyForecastApiResponseSchema>["list"][number],
+			) => string;
+		}[] = [
 			{
-				role: "system",
-				content: systemPrompt,
+				header: "Date/Time",
+				getter: (
+					item: z.infer<typeof dailyForecastApiResponseSchema>["list"][number],
+				) => {
+					return new Date(item.dt * 1000).toLocaleString();
+				},
 			},
 			{
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: request,
-					},
-				],
+				header: "Temp (°F)",
+				getter: (
+					item: z.infer<typeof dailyForecastApiResponseSchema>["list"][number],
+				) => `${item.main.temp}`,
 			},
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "ActionRequestResponse",
-				schema: z.toJSONSchema(actionRequestSchema),
+			{
+				header: "Description",
+				getter: (
+					item: z.infer<typeof dailyForecastApiResponseSchema>["list"][number],
+				) => item.weather[0].description,
 			},
-		},
-	});
+		];
+		const output = [
+			columns.map((col) => col.header).join(" | "),
+			columns.map(() => "---").join(" | "),
+			...weatherData.data.list.map((item) =>
+				columns.map((col) => col.getter(item)).join(" | "),
+			),
+		].join("\n");
 
-	const respContent = response.choices[0].message.content as string;
-
-	const parsed = actionRequestSchema.safeParse(JSON.parse(respContent));
-	if (!parsed.success)
-		throw new Error(`Failed to parse response: ${respContent}`);
-
-	console.log(`Extracted information request tool from "${request}":`, {
-		tool: parsed.data,
-	});
-
-	if (parsed.data === "set_timer") {
-		return await setTimer(request);
+		return {
+			role: "tool",
+			tool_call_id: toolCall.id,
+			content: output,
+		};
 	}
 
-	if (parsed.data === "send_email") {
-		return await sendAnEmail(request);
-	}
-
-	if (parsed.data === "schedule_meeting") {
-		return await scheduleMeeting(request);
-	}
-
-	throw new Error("Unsupported information request tool");
+	throw new Error(`Unsupported tool call: ${toolName}`);
 }
 
 /**
  * This is the main function that simulates a personal assistant handling various user requests.
  */
-export async function personalAssistantDemo(request: string) {
-	const category = await categorizeRequest(request);
+export async function weatherBotDemo(request: string) {
+	const openai = getOpenAIClient();
 
-	if (category === "information_request") {
-		return await handleInformationRequest(request);
-	}
+	const messages: ChatCompletionMessageParam[] = [
+		{
+			role: "system",
+			content: `You are a helpful personal assistant that can provide weather information.`,
+		},
+		{
+			role: "user",
+			content: request,
+		},
+	];
 
-	if (category === "action_request") {
-		return await handleActionRequest(request);
-	}
+	const tools: ChatCompletionTool[] = [
+		{
+			type: "function",
+			function: {
+				name: ToolNames.GET_CURRENT_WEATHER,
+				description: "Get the current weather for a given location.",
+				parameters: z.toJSONSchema(getWeatherParamsSchema),
+			},
+		},
+		{
+			type: "function",
+			function: {
+				name: ToolNames.GET_FORECAST,
+				description: "Get the forecast for a given location.",
+				parameters: z.toJSONSchema(getWeatherParamsSchema),
+			},
+		},
+	];
 
-	throw new Error("Unsupported request category");
+	let finished = false;
+	do {
+		// Make the initial LLM call
+		const response = await openai.chat.completions.create({
+			model: "anthropic/claude-sonnet-4.5",
+			messages: messages,
+			tools,
+		});
+
+		// Store the response message from the LLM
+		messages.push(response.choices[0].message);
+
+		// Handle any tool calls based on the response
+		if (response.choices[0].message.tool_calls) {
+			// Resolve all tool calls in parallel
+			const toolCallResults = await Promise.all(
+				response.choices[0].message.tool_calls.map(async (toolCall) => {
+					const type = toolCall.type;
+					if (type !== "function")
+						throw new Error(`Unsupported tool call type: ${type}`);
+
+					return handleToolCall(toolCall);
+				}),
+			);
+
+			// Add tool call results to messages for next iteration
+			messages.push(...toolCallResults);
+		} else {
+			// No tool calls, we are finished
+			finished = true;
+		}
+
+		// If there are no more tool calls, set finished = true
+	} while (!finished);
+
+	const lastMessage = messages[messages.length - 1];
+	return lastMessage.content;
 }

@@ -3,6 +3,7 @@ import { extractSignature } from "./demos/find-signature.js";
 import { personalAssistantDemo } from "./demos/personal-assistant.js";
 import { readUtilityBill } from "./demos/read-utility-bill.js";
 import { twentyQuestions } from "./demos/twenty-questions.js";
+import { weatherBotDemo } from "./demos/weather-bot.js";
 import { yesOrNo } from "./demos/yes-no.js";
 
 enum DemoName {
@@ -11,6 +12,7 @@ enum DemoName {
 	READ_UTILITY_BILL = "read-utility-bill",
 	TWENTY_QUESTIONS = "twenty-questions",
 	FIND_SIGNATURE = "find-signature",
+	WEATHER_BOT = "weather-bot",
 }
 
 const DemoType: Type<string, DemoName> = {
@@ -67,6 +69,11 @@ const cmd = command({
 
 		if (args.demo === DemoName.PERSONAL_ASSISTANT) {
 			const response = await personalAssistantDemo(args.prompt);
+			console.log("Response:", response);
+		}
+
+		if (args.demo === DemoName.WEATHER_BOT) {
+			const response = await weatherBotDemo(args.prompt);
 			console.log("Response:", response);
 		}
 	},
