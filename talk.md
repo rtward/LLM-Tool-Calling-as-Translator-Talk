@@ -162,7 +162,7 @@ Not translation from english to japanese
  * Function Calling
  * AI "Integrations"
 
-<!-- 6:00 -->
+<!-- 7:00 -->
 
 <!--
 So back to tool calling.
@@ -214,7 +214,7 @@ What it really is, is structured output
   section { text-align: center }
 </style>
 
-<!-- 8:00 -->
+<!-- 10:00 -->
 
 # Demos!
 
@@ -280,7 +280,7 @@ These demos are all using the OpenAI API with OpenRouter
 
 <!-- 12:00 -->
 
-![height:500px](images/twenty-questions-demo.png)
+![height:600px](images/twenty-questions-demo.png)
 
 <!--
 This isn't really part of the talk, I just thought it was a fun use case for the first demo
@@ -372,7 +372,7 @@ Actually the thing that got me going on this kick
 
 ---
 
-<!-- 18:00 -->
+<!-- 19:00 -->
 
 # Personal Assistant
 
@@ -411,7 +411,7 @@ Not going to post the code for this one because it's a lot and it looks much the
   section { text-align: center }
 </style>
 
-<!-- 30:00 -->
+<!-- 23:00 -->
 
 # Tool Calling
 
@@ -428,7 +428,7 @@ Tool calling closes that loop by letting us then send information back to the LL
   section { text-align: center }
 </style>
 
-<!-- 32:00 -->
+<!-- 25:00 -->
 
 # Weather Demo
 
@@ -443,7 +443,7 @@ It has access to a tool to get the weather, then interprets the result for me.
 
 ---
 
-<!-- 36:00 -->
+<!-- 30:00 -->
 
 # Tool Calling Formats
 
@@ -472,7 +472,7 @@ Similarities:
 
 ---
 
-<!-- 38:00 -->
+<!-- 33:00 -->
 
 # OpenAI
 
@@ -526,7 +526,7 @@ async function handleToolCall(toolCall) {
 
 ---
 
-<!-- 39:00 -->
+<!-- 36:00 -->
 
 # Bedrock
 
