@@ -4,19 +4,12 @@ theme: default
 class: invert
 ---
 
-# TODOS
-
- - Take a pass on cleaning up and commenting the demo code
- - Run through the whole talk for readability
- - Do some styling on the talk
-
----
+<style scoped>
+  section { text-align: center }
+</style>
 
 # LLM Tool Calling
-
-## or
-
-# Your computer's universal translator
+## or, your computer's universal translator
 
 ![width:300px](images/qr-link.png)
 
@@ -24,25 +17,28 @@ https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # Who am I?
 
 ---
 
-# Robert Ward
+## Robert Ward
 
  * Co-founder of Arch Reactor Hackerspace
  * Co-founder of Juristat Inc.
  * Cub Scout Leader
  * Cargo Bike Enthusiast
  * Star Trek Fan
- * Playhouse Builder
- * ![width:300px](images/playhouse.jpg)
+ * Playhouse Builder <br/> ![width:300px](images/playhouse.jpg)
 
 <!-- 0:00 -->
 
 ---
 
-# Bone-Fides
+## Bone-Fides
 
  * Several Time Phreaknic Speaker
  * Currently building AI products for the legal industry
@@ -54,13 +50,21 @@ https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # A Confession
  
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # A Confession
 
-# I'm an AI Sceptic
+## I'm an AI Sceptic
 
 <!-- 1:00 -->
 
@@ -72,11 +76,21 @@ I'm not even particularly impressed with the current tech for most use cases.
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # A Promise
 
 ---
 
-# This Talk is my Work
+<style scoped>
+  section { text-align: center }
+</style>
+
+# A Promise
+
+## This Talk is my Work
 
 <!-- 1:30 -->
 
@@ -93,7 +107,7 @@ No AI was used to work on the content or the demos
 
 ---
 
-# AI At Home 
+## AI At Home 
 
  * Dissapointed with AI search
  * Dissapointed with AI assistants
@@ -105,7 +119,7 @@ Story about using Claude to inventory and make a shopping list
 
 ---
 
-# AI At Work
+## AI At Work
 
  * Pressured to use AI
  * Dissapointed with coding tools
@@ -127,7 +141,11 @@ Complain about the USPTO / PDFs
 
 # What's the Common Thread?
 
-# AI is *Great* at Translation
+## LLMs aren't good at creation
+
+## but...
+
+## LLMs are *Great* at translation
 
 <!--
 Translation from the real world to computer readable
@@ -138,9 +156,11 @@ Not translation from english to japanese
 
 # Tool Calling
 
- * MCP Servers
+ * Model Context Protocol (MCP) Servers
+ * Retreival Augmented Generation (RAG)
  * Tool Calling
- * RAG 
+ * Function Calling
+ * AI "Integrations"
 
 <!-- 6:00 -->
 
@@ -153,6 +173,18 @@ What it really is, is structured output
 -->
 
 ---
+
+<style scoped>
+  section { text-align: center }
+</style>
+
+# Structured Output
+
+---
+
+<style scoped>
+  section { text-align: center }
+</style>
 
 # Structured Output
 
@@ -178,6 +210,10 @@ What it really is, is structured output
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 <!-- 8:00 -->
 
 # Demos!
@@ -192,30 +228,30 @@ These demos are all using the OpenAI API with OpenRouter
 # Yes / No
 
 ```typescript
-	const yesNoSchema = z.object({
-		answer: z.enum(["yes", "maybe", "no"]).describe("The answer to the question"),
-	});
+  const yesNoSchema = z.object({
+    answer: z.enum(["yes", "maybe", "no"]).describe("The answer to the question"),
+  });
 
-	const response = await openRouter.chat.send({
-		model: "google/gemini-2.5-flash",
-		messages: [
-			{
-				role: "system",
-				content: "Your job is to translate a response from a user into a simple 'yes', 'no', or 'maybe' answer.",
-			},
-			{
-				role: "user",
-				content: statement,
-			},
-		],
-		responseFormat: {
-			type: "json_schema",
-			jsonSchema: {
-				name: "YesOrNoResponse",
-				schema: z.toJSONSchema(yesNoSchema),
-			},
-		},
-	});
+  const response = await openRouter.chat.send({
+    model: "google/gemini-2.5-flash",
+    messages: [
+      {
+        role: "system",
+        content: "Your job is to translate a response from a user into a simple 'yes', 'no', or 'maybe' answer.",
+      },
+      {
+        role: "user",
+        content: statement,
+      },
+    ],
+    responseFormat: {
+      type: "json_schema",
+      jsonSchema: {
+        name: "YesOrNoResponse",
+        schema: z.toJSONSchema(yesNoSchema),
+      },
+    },
+  });
 ```
 
 <!--
@@ -226,6 +262,10 @@ These demos are all using the OpenAI API with OpenRouter
 
 # Yes / No
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 <video height=500px autoplay loop muted>
 	<source src='images/yes-no-demo.mov'>
 </video>
@@ -233,6 +273,10 @@ These demos are all using the OpenAI API with OpenRouter
 ---
 
 # 20 Questions
+
+<style scoped>
+  section { text-align: center }
+</style>
 
 <!-- 12:00 -->
 
@@ -258,35 +302,39 @@ Actually the thing that got me going on this kick
 # Document Parsing
 
 ```typescript
-	const response = await openai.chat.completions.create({
-		model: "google/gemini-2.5-flash",
-		messages: [
-			{ role: "system", content: systemPrompt },
-			{
-				role: "user",
-				content: [
-					{
-						type: "file",
-						file: {
-							filename: "document.pdf",
-							file_id: "document.pdf",
-							file_data: fileData,
-						},
-					},
-				],
-			},
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "SignatureExtractionResponse",
-				schema: z.toJSONSchema(signatureExtractionSchema),
-			},
-		},
-	});
+  const response = await openai.chat.completions.create({
+    model: "google/gemini-2.5-flash",
+    messages: [
+      { role: "system", content: systemPrompt },
+      {
+        role: "user",
+        content: [
+          {
+            type: "file",
+            file: {
+              filename: "document.pdf",
+              file_id: "document.pdf",
+              file_data: fileData,
+            },
+          },
+        ],
+      },
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "SignatureExtractionResponse",
+        schema: z.toJSONSchema(signatureExtractionSchema),
+      },
+    },
+  });
 ```
 
 ---
+
+<style scoped>
+  section { text-align: center }
+</style>
 
 # Document Parsing
 
@@ -294,17 +342,29 @@ Actually the thing that got me going on this kick
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # Document Parsing
 
 ![height:500px](images/find-signature-demo.png)
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # Document Parsing
 
 ![](images/bill-image.png)
 
 ---
+
+<style scoped>
+  section { text-align: center }
+</style>
 
 # Document Parsing
 
@@ -335,6 +395,10 @@ Not going to post the code for this one because it's a lot and it looks much the
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 # Personal Assistant
 
 <video height=500px autoplay loop muted>
@@ -342,6 +406,10 @@ Not going to post the code for this one because it's a lot and it looks much the
 </video>
 
 ---
+
+<style scoped>
+  section { text-align: center }
+</style>
 
 <!-- 30:00 -->
 
@@ -355,6 +423,10 @@ Tool calling closes that loop by letting us then send information back to the LL
 -->
 
 ---
+
+<style scoped>
+  section { text-align: center }
+</style>
 
 <!-- 32:00 -->
 
@@ -415,14 +487,14 @@ Also have "custom" tools that can use context-free grammers for building output,
 
 ```typescript
 const tools: ChatCompletionTool[] = [
-	{
-		type: "function",
-		function: {
-			name: ToolNames.GET_CURRENT_WEATHER,
-			description: "Get the current weather for a given location.",
-			parameters: z.toJSONSchema(getWeatherParamsSchema),
-		},
-	},
+  {
+    type: "function",
+    function: {
+      name: ToolNames.GET_CURRENT_WEATHER,
+      description: "Get the current weather for a given location.",
+      parameters: z.toJSONSchema(getWeatherParamsSchema),
+    },
+  },
 ];
 ```
 
@@ -436,19 +508,19 @@ Tool calls have their own role in the conversation
 
 ```typescript
 async function handleToolCall(toolCall) {
-	const toolName = toolCall.function.name;
-	const args = toolCall.function.arguments;
+  const toolName = toolCall.function.name;
+  const args = toolCall.function.arguments;
 
-	if (toolName === ToolNames.GET_CURRENT_WEATHER) {
-		console.log("Handling get_weather tool call with args:", args);
-		...
-		return {
-			role: "tool",
-			tool_call_id: toolCall.id,
-			content: weather,
-		};
-	}
-	...
+  if (toolName === ToolNames.GET_CURRENT_WEATHER) {
+    console.log("Handling get_weather tool call with args:", args);
+    ...
+    return {
+      role: "tool",
+      tool_call_id: toolCall.id,
+      content: weather,
+    };
+  }
+  ...
 }
 ```
 
@@ -464,13 +536,13 @@ Bedrock is an API only service by AWS that supports a ton of foundational models
 
 ```typescript
 const tools = [{
-	toolSpec: {
-	name: 'multi-step-plan',
-	description:
-	  'Use this tool to create a multi step plan to accomplish your goal.',
-	inputSchema: {
-	  json: multiStepPlanSchema,
-	},
+  toolSpec: {
+    name: 'multi-step-plan',
+    description:
+      'Use this tool to create a multi step plan to accomplish your goal.',
+    inputSchema: {
+      json: multiStepPlanSchema,
+    },
   },
 }]
 ```
@@ -515,7 +587,7 @@ The idea is a simple standard API that conforms to a standard format and allows 
   server.tool('do-cool-stuff', 'Does some cool stuff',
     { whatShouldIdo: z.string() },
     async (args) => {
-	  ...
+    ...
       const result: CallToolResult = {
         content: [{ type: 'text', text: coolStuffResult }],
       }
@@ -553,6 +625,8 @@ export async function mcpToolCall(args) {
  * Planning Tool
  * Home Automation
  * Personal Knowledge Base
+ * Custom Assistant
+ * Document Organizer
 
 <!--
 Planning Tool: Have the LLM make a plan step by step, then you can run those steps independently or sequentially
@@ -562,11 +636,15 @@ PKB: Store your documents and notes and let an LLM search them for you
 
 ---
 
+<style scoped>
+  section { text-align: center }
+</style>
+
 <!-- 45:00 -->
 
 # That's all folks! / Questions?
 
-![width:300px](images/qr-link.png)
+![width:200px](images/qr-link.png)
 
 https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
 

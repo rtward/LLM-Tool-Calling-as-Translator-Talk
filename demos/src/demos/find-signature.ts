@@ -1,4 +1,4 @@
-import * as fs from "fs/promises";
+import * as fs from "node:fs/promises";
 import { OpenAI } from "openai";
 import z from "zod";
 
