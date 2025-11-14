@@ -6,14 +6,41 @@ class: invert
 
 <style scoped>
   section { text-align: center }
+  .container { display: flex }
+  .column { flex: 1 }
 </style>
 
 # LLM Tool Calling
 ## or, your computer's universal translator
 
-![width:300px](images/qr-link.png)
+<div class='container'>
+  <div class='column'>
+    <img width='200px' src='images/qr-repo-link.png'>
+    <br>
+    Talk Repository
+  </div>
 
-https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
+  <div class='column'>
+    <img width='200px' src='images/qr-talk-link.png'>
+    <br>
+    Talk Slides
+  </div>
+</div>
+<hr>
+<div class='container'>
+  <div class='column'>
+    Website: https://rtward.com/
+    <br>
+    Signal: rtward.32
+  </div>
+
+  <div class='column'>
+    Bluesky: @rtward.com
+    <br>
+    Mastodon: @rtward@mastodon.social
+  </div>
+</div>
+
 
 ---
 
@@ -31,7 +58,6 @@ https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
  * Co-founder of Juristat Inc.
  * Cub Scout Leader
  * Cargo Bike Enthusiast
- * Star Trek Fan
  * Playhouse Builder <br/> ![width:300px](images/playhouse.jpg)
 
 <!-- 0:00 -->
@@ -661,17 +687,38 @@ PKB: Store your documents and notes and let an LLM search them for you
 
 <style scoped>
   section { text-align: center }
+  .container { display: flex }
+  .column { flex: 1 }
 </style>
 
 <!-- 45:00 -->
 
 # That's all folks! / Questions?
 
-![width:200px](images/qr-link.png)
+<div class='container'>
+  <div class='column'>
+    <img width='200px' src='images/qr-repo-link.png'>
+    <br>
+    Talk Repository
+  </div>
 
-https://github.com/rtward/LLM-Tool-Calling-as-Translator-Talk
+  <div class='column'>
+    <img width='200px' src='images/qr-talk-link.png'>
+    <br>
+    Talk Slides
+  </div>
+</div>
+<hr>
+<div class='container'>
+  <div class='column'>
+    Website: https://rtward.com/
+    <br>
+    Signal: rtward.32
+  </div>
 
-Website: https://rtward.com/
-Signal: `rtward.32`
-Bluesky: `@rtward.com`
-Mastodon: `@rtward@mastodon.social`
+  <div class='column'>
+    Bluesky: @rtward.com
+    <br>
+    Mastodon: @rtward@mastodon.social
+  </div>
+</div>
