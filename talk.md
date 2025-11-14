@@ -114,6 +114,7 @@ No AI was used to work on the content or the demos
  * Thrilled with transcription
 
 <!--
+Fuck off google
 Story about using Claude to inventory and make a shopping list
 -->
 
@@ -180,6 +181,10 @@ What it really is, is structured output
 
 # Structured Output
 
+<!--
+All of these things are just "forcing" the LLM to spit out tokens in a standard format, almost always JSON
+-->
+
 ---
 
 <style scoped>
@@ -190,15 +195,20 @@ What it really is, is structured output
 
 ## vs
 
-# Regular Output
+# Unstructured Output
 
 ---
 
-## Regular Output
+## Unstructured Output
 
 > *user:* What's the Capital of Austria
 
 > *assistant:* The capital city of Austria is Vienna
+
+<!--
+Unstrctured output is normal "human" language.
+This is how we're used to interacting with ChatGPT or other systems.
+-->
 
 ---
 
@@ -207,6 +217,11 @@ What it really is, is structured output
 > *user:* What's the Capital of Austria
 
 > *assistant:* `{"country": "Austria", "capital": "Vienna"}`
+
+<!--
+Structred output is where we ask the LLM to generate the data in a defined format.
+It's taken larger and more complex models to make this work reliably.
+-->
 
 ---
 
@@ -239,10 +254,7 @@ These demos are all using the OpenAI API with OpenRouter
         role: "system",
         content: "Your job is to translate a response from a user into a simple 'yes', 'no', or 'maybe' answer.",
       },
-      {
-        role: "user",
-        content: statement,
-      },
+      { role: "user", content: statement },
     ],
     responseFormat: {
       type: "json_schema",
@@ -381,8 +393,12 @@ Actually the thing that got me going on this kick
  - Decide action
 
 <!--
+This demonstrates the approach that I've had great success with in my work
+
 The advantage of doing multiple levels of LLM calls is that you avoid having to put massive tool definitions into the context window.
+
 This saves you both context and makes your output more accurate in my experience.
+
 It does increase the cost and latency though.
 Not going to post the code for this one because it's a lot and it looks much the same.
 -->
@@ -419,6 +435,7 @@ Not going to post the code for this one because it's a lot and it looks much the
 
 <!--
 So all of those demos were one way, we got some info out of an LLM and used it to do something for the user.
+
 Tool calling closes that loop by letting us then send information back to the LLM.
 -->
 
@@ -453,6 +470,7 @@ It has access to a tool to get the weather, then interprets the result for me.
 
 <!--
 Basically all of these are based on the JSONSchema format.
+Demos here have been in the OpenAI format
 -->
 
 ---
@@ -478,10 +496,15 @@ Similarities:
 
 <!--
 OpenAI supports MCP now, but also has some of their own ideas.
+
 They've supported calling OpenAPI spec APIs as well.
+
 IMO this spec can be too complex for simple LLMs to call, hasn't worked well in my experience.
+
 OpenAI also has a native foramt for doing tool calls in their API, which is what I'm showing off here.
+
 All of these demos were done using the OpenAI API, but talking to the OpenRouter LLM service.
+
 Also have "custom" tools that can use context-free grammers for building output, but I haven't gotten into that
 -->
 
