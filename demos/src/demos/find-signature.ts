@@ -11,66 +11,66 @@ The documents you'll be analyzing are patent prosecution documents, so each sign
 `;
 
 const signatureExtractionSchema = z.object({
-	name: z
-		.string()
-		.nullable()
-		.describe("The extracted name from the signature, or null if none found"),
-	registrationNumber: z
-		.string()
-		.nullable()
-		.describe(
-			"The five digit registration number associated with the signature, or null if none found",
-		),
+  name: z
+    .string()
+    .nullable()
+    .describe("The extracted name from the signature, or null if none found"),
+  registrationNumber: z
+    .string()
+    .nullable()
+    .describe(
+      "The five digit registration number associated with the signature, or null if none found",
+    ),
 });
 
 export async function extractSignature(file: string) {
-	const openai = new OpenAI({
-		baseURL: "https://openrouter.ai/api/v1",
-		apiKey: env.OPENROUTER_API_KEY,
-	});
+  const openai = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: env.OPENROUTER_API_KEY,
+  });
 
-	const imageBuffer = await fs.readFile(file);
-	const base64Pdf = imageBuffer.toString("base64");
-	const fileData = `data:application/pdf;base64,${base64Pdf}`;
+  const imageBuffer = await fs.readFile(file);
+  const base64Pdf = imageBuffer.toString("base64");
+  const fileData = `data:application/pdf;base64,${base64Pdf}`;
 
-	const response = await openai.chat.completions.create({
-		model: "google/gemini-2.5-flash",
-		messages: [
-			{
-				role: "system",
-				content: systemPrompt,
-			},
-			{
-				role: "user",
-				content: [
-					{
-						type: "text",
-						text: `Please analyze the following document for signatures:`,
-					},
-					{
-						type: "file",
-						file: {
-							filename: "document.pdf",
-							file_id: "document.pdf",
-							file_data: fileData,
-						},
-					},
-				],
-			},
-		],
-		response_format: {
-			type: "json_schema",
-			json_schema: {
-				name: "SignatureExtractionResponse",
-				schema: z.toJSONSchema(signatureExtractionSchema),
-			},
-		},
-	});
+  const response = await openai.chat.completions.create({
+    model: "google/gemini-2.5-flash",
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: `Please analyze the following document for signatures:`,
+          },
+          {
+            type: "file",
+            file: {
+              filename: "document.pdf",
+              file_id: "document.pdf",
+              file_data: fileData,
+            },
+          },
+        ],
+      },
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "SignatureExtractionResponse",
+        schema: z.toJSONSchema(signatureExtractionSchema),
+      },
+    },
+  });
 
-	const respContent = response.choices[0].message.content as string;
-	const parsed = signatureExtractionSchema.safeParse(JSON.parse(respContent));
-	if (!parsed.success)
-		throw new Error(`Failed to parse response: ${respContent}`);
+  const respContent = response.choices[0].message.content as string;
+  const parsed = signatureExtractionSchema.safeParse(JSON.parse(respContent));
+  if (!parsed.success)
+    throw new Error(`Failed to parse response: ${respContent}`);
 
-	return parsed.data;
+  return parsed.data;
 }

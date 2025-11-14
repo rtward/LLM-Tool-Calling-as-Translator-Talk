@@ -6,12 +6,12 @@ import { env } from "../util/config.js";
 import { yesOrNo } from "./yes-no.js";
 
 const twentyQuestionsSchema = z.object({
-	question: z.string().describe("The next yes/no question to ask the user"),
-	isGuess: z
-		.boolean()
-		.describe(
-			"Whether this question is a guess of the answer.  If the user answers yes to a guess, the game is over.",
-		),
+  question: z.string().describe("The next yes/no question to ask the user"),
+  isGuess: z
+    .boolean()
+    .describe(
+      "Whether this question is a guess of the answer.  If the user answers yes to a guess, the game is over.",
+    ),
 });
 
 const systemPrompt = `
@@ -22,76 +22,76 @@ Try to guess the answer within twenty questions.
 `;
 
 export async function twentyQuestions() {
-	const openRouter = new OpenRouter({
-		apiKey: env.OPENROUTER_API_KEY,
-	});
+  const openRouter = new OpenRouter({
+    apiKey: env.OPENROUTER_API_KEY,
+  });
 
-	const rl = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout,
-	});
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
-	const numQuestions = 0;
-	const messages: Message[] = [
-		{
-			role: "system",
-			content: systemPrompt,
-		},
-		{
-			role: "assistant",
-			content:
-				"I am ready to play twenty questions! Think of something, and I will start asking questions.  Let me know when you're ready!",
-		},
-	];
+  const numQuestions = 0;
+  const messages: Message[] = [
+    {
+      role: "system",
+      content: systemPrompt,
+    },
+    {
+      role: "assistant",
+      content:
+        "I am ready to play twenty questions! Think of something, and I will start asking questions.  Let me know when you're ready!",
+    },
+  ];
 
-	let lastAssistantQuestion: z.infer<typeof twentyQuestionsSchema> | null =
-		null;
-	while (numQuestions < 20) {
-		const lastAssistantMessage = messages
-			.filter((m) => m.role === "assistant")
-			.slice(-1)[0];
-		if (!lastAssistantMessage) throw new Error("No assistant message found");
+  let lastAssistantQuestion: z.infer<typeof twentyQuestionsSchema> | null =
+    null;
+  while (numQuestions < 20) {
+    const lastAssistantMessage = messages
+      .filter((m) => m.role === "assistant")
+      .slice(-1)[0];
+    if (!lastAssistantMessage) throw new Error("No assistant message found");
 
-		const answer = await rl.question(
-			`${lastAssistantMessage.content as string}\nYour answer: `,
-		);
-		const YesOrNoResponse = await yesOrNo(answer);
+    const answer = await rl.question(
+      `${lastAssistantMessage.content as string}\nYour answer: `,
+    );
+    const YesOrNoResponse = await yesOrNo(answer);
 
-		if (lastAssistantQuestion?.isGuess && YesOrNoResponse.answer === "yes") {
-			console.log("I guessed it!");
-			break;
-		}
+    if (lastAssistantQuestion?.isGuess && YesOrNoResponse.answer === "yes") {
+      console.log("I guessed it!");
+      break;
+    }
 
-		messages.push({
-			role: "user",
-			content: `Answer: ${YesOrNoResponse.answer}`,
-		});
+    messages.push({
+      role: "user",
+      content: `Answer: ${YesOrNoResponse.answer}`,
+    });
 
-		const response = await openRouter.chat.send({
-			model: "google/gemini-2.5-flash",
-			messages,
-			responseFormat: {
-				type: "json_schema",
-				jsonSchema: {
-					name: "TwentyQuestionsResponse",
-					schema: z.toJSONSchema(twentyQuestionsSchema),
-				},
-			},
-		});
+    const response = await openRouter.chat.send({
+      model: "google/gemini-2.5-flash",
+      messages,
+      responseFormat: {
+        type: "json_schema",
+        jsonSchema: {
+          name: "TwentyQuestionsResponse",
+          schema: z.toJSONSchema(twentyQuestionsSchema),
+        },
+      },
+    });
 
-		const respContent = response.choices[0].message.content as string;
-		const parsed = twentyQuestionsSchema.safeParse(JSON.parse(respContent));
-		if (!parsed.success)
-			throw new Error(`Failed to parse response: ${respContent}`);
-		lastAssistantQuestion = parsed.data;
+    const respContent = response.choices[0].message.content as string;
+    const parsed = twentyQuestionsSchema.safeParse(JSON.parse(respContent));
+    if (!parsed.success)
+      throw new Error(`Failed to parse response: ${respContent}`);
+    lastAssistantQuestion = parsed.data;
 
-		messages.push({
-			role: "assistant",
-			content: parsed.data.question,
-		});
-	}
+    messages.push({
+      role: "assistant",
+      content: parsed.data.question,
+    });
+  }
 
-	rl.close();
+  rl.close();
 
-	return "Game Over";
+  return "Game Over";
 }

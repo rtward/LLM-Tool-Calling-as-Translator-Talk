@@ -14,6 +14,12 @@ Set your OpenRouter key as an environment variable:
 export OPENROUTER_API_KEY='<MY KEY>'
 ```
 
+Set your OpenWeather key as an environment variable:
+
+```
+export OPENWEATHER_API_KEY='<MY KEY>'
+```
+
 Run the demos with:
 
 ```
